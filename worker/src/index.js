@@ -7,6 +7,20 @@ Return only JSON: {"score": 72, "verdict": "Passes", "reason": "one sentence"}
 
 Verdict = "Passes" if score >= 60, "Flagged" if score < 60.`;
 
+// Simple in-memory rate limiter: max 10 requests per IP per minute
+const ipHits = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const window = 60_000;
+  const max = 10;
+  const hits = (ipHits.get(ip) || []).filter(t => now - t < window);
+  if (hits.length >= max) return true;
+  hits.push(now);
+  ipHits.set(ip, hits);
+  return false;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -23,6 +37,11 @@ export default {
 
     if (url.pathname !== "/score" || request.method !== "POST") {
       return new Response("Not found", { status: 404 });
+    }
+
+    const ip = request.headers.get("cf-connecting-ip") || "unknown";
+    if (isRateLimited(ip)) {
+      return jsonResponse({ error: "Too many requests. Take a breath." }, 429);
     }
 
     let body;
