@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof of Human</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --border: #222;
+    --text: #e8e8e8;
+    --muted: #555;
+    --accent: #e8e8e8;
+    --pass: #4ade80;
+    --fail: #f87171;
+    --warn: #fbbf24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    max-width: 680px;
+    padding: 48px 24px 0;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  header p.subtitle {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+
+  .progress-bar {
+    width: 100%;
+    max-width: 680px;
+    padding: 32px 24px 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .progress-dot {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.4s ease;
+  }
+
+  .progress-dot.done { background: var(--pass); }
+  .progress-dot.fail { background: var(--fail); }
+  .progress-dot.current { background: var(--warn); }
+
+  main {
+    width: 100%;
+    max-width: 680px;
+    padding: 32px 24px 80px;
+    flex: 1;
+  }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* INTRO */
+  #intro-screen {
+    text-align: center;
+    padding-top: 24px;
+  }
+
+  #intro-screen .premise {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #aaa;
+    max-width: 520px;
+    margin: 0 auto 36px;
+  }
+
+  #intro-screen .premise strong {
+    color: var(--text);
+    font-style: italic;
+    font-weight: normal;
+  }
+
+  /* QUESTION */
+  .question-number {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    padding: 16px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: #444; }
+  textarea::placeholder { color: var(--muted); font-style: italic; }
+
+  .char-count {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: monospace;
+  }
+
+  /* RESULT PANEL */
+  .result-panel {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: none;
+  }
+
+  .result-panel.visible { display: block; }
+
+  .score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .score-number {
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1;
+    font-family: monospace;
+  }
+
+  .score-number.pass { color: var(--pass); }
+  .score-number.fail { color: var(--fail); }
+
+  .verdict-badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-family: monospace;
+  }
+
+  .verdict-badge.pass { background: rgba(74,222,128,0.12); color: var(--pass); border: 1px solid rgba(74,222,128,0.3); }
+  .verdict-badge.fail { background: rgba(248,113,113,0.12); color: var(--fail); border: 1px solid rgba(248,113,113,0.3); }
+
+  .reason-text {
+    font-size: 0.9rem;
+    color: #aaa;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* SCORE BAR */
+  .score-bar-wrap {
+    margin: 16px 0;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  .score-bar-fill.pass { background: var(--pass); }
+  .score-bar-fill.fail { background: var(--fail); }
+
+  /* LOADING */
+  .loading-text {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    display: none;
+  }
+
+  .loading-text.visible { display: block; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  .btn-primary:hover { background: #ccc; }
+  .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: #444; }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  /* FINAL SCREEN */
+  #final-screen { text-align: center; }
+
+  .final-score {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-family: monospace;
+    font-weight: 400;
+    margin: 32px 0 8px;
+  }
+
+  .final-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .final-verdict {
+    font-size: 1.1rem;
+    color: #aaa;
+    max-width: 480px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .results-breakdown {
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    font-size: 0.85rem;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+
+  .breakdown-q {
+    flex: 1;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  .breakdown-score {
+    font-family: monospace;
+    font-size: 1rem;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .breakdown-score.pass { color: var(--pass); }
+  .breakdown-score.fail { color: var(--fail); }
+
+  /* ERROR */
+  .error-msg {
+    color: var(--fail);
+    font-size: 0.85rem;
+    margin-top: 12px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    header { padding-top: 32px; }
+    .question-text { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Proof of Human</h1>
+  <p class="subtitle">A reverse Turing Test</p>
+</header>
+
+<div class="progress-bar" id="progress-bar">
+  <div class="progress-dot" id="dot-0"></div>
+  <div class="progress-dot" id="dot-1"></div>
+  <div class="progress-dot" id="dot-2"></div>
+  <div class="progress-dot" id="dot-3"></div>
+  <div class="progress-dot" id="dot-4"></div>
+</div>
+
+<main>
+
+  <!-- INTRO -->
+  <div id="intro-screen" class="screen active">
+    <p class="premise">
+      On the longest day, the question isn't whether the sun rises.<br>
+      It's whether you're still human enough to notice.<br><br>
+      Five questions. Write your answers.<br>
+      Claude reads them and scores how human you sound.<br><br>
+      <strong>The hard part isn't being human.<br>
+      It's sounding like one.</strong>
+    </p>
+    <button class="btn btn-primary" onclick="startGame()">Begin</button>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="question-screen" class="screen">
+    <div class="question-number" id="q-number"></div>
+    <div class="question-text" id="q-text"></div>
+
+    <textarea
+      id="answer-input"
+      placeholder="Write your answer here…"
+      oninput="handleInput()"
+    ></textarea>
+    <div class="char-count" id="char-count">0 characters</div>
+
+    <div class="loading-text" id="loading-text">reading your answer…</div>
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="result-panel" id="result-panel">
+      <div class="score-row">
+        <div class="score-number" id="result-score"></div>
+        <div class="verdict-badge" id="result-verdict"></div>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" id="score-bar"></div>
+      </div>
+      <div class="reason-text" id="result-reason"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-ghost" id="next-btn" onclick="nextQuestion()" style="display:none">
+        Next →
+      </button>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div id="final-screen" class="screen">
+    <div class="final-score" id="final-score-num"></div>
+    <div class="final-label">Average human score</div>
+    <div class="final-verdict" id="final-verdict-text"></div>
+
+    <div class="results-breakdown" id="results-breakdown"></div>
+
+    <button class="btn btn-ghost" onclick="resetGame()">Play again</button>
+  </div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  "Describe the last time something genuinely surprised you. Not shocked — surprised.",
+  "What's something you changed your mind about in the last year? What moved you?",
+  "What's a skill you have that you never bothered to put on your CV?",
+  "Name something you've read or watched that you think about more than you expected to.",
+  "What do you actually think about AI? Not what you're supposed to think — what do you actually think."
+];
+
+// Replace with your deployed worker URL after deployment
+const API_URL = "https://proof-of-human-api.YOUR_SUBDOMAIN.workers.dev/score";
+
+let state = {
+  current: 0,
+  results: [],
+  submitted: false,
+};
+
+function startGame() {
+  showScreen("question-screen");
+  loadQuestion(0);
+}
+
+function loadQuestion(index) {
+  state.current = index;
+  state.submitted = false;
+
+  document.getElementById("q-number").textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+  document.getElementById("q-text").textContent = QUESTIONS[index];
+  document.getElementById("answer-input").value = "";
+  document.getElementById("char-count").textContent = "0 characters";
+  document.getElementById("submit-btn").disabled = true;
+  document.getElementById("submit-btn").style.display = "inline-block";
+  document.getElementById("next-btn").style.display = "none";
+  document.getElementById("result-panel").classList.remove("visible");
+  document.getElementById("loading-text").classList.remove("visible");
+  document.getElementById("error-msg").classList.remove("visible");
+  document.getElementById("answer-input").disabled = false;
+  document.getElementById("answer-input").focus();
+
+  updateProgress();
+}
+
+function handleInput() {
+  const val = document.getElementById("answer-input").value;
+  document.getElementById("char-count").textContent = `${val.length} character${val.length !== 1 ? "s" : ""}`;
+  document.getElementById("submit-btn").disabled = val.trim().length < 10;
+}
+
+async function submitAnswer() {
+  if (state.submitted) return;
+  const answer = document.getElementById("answer-input").value.trim();
+  if (answer.length < 10) return;
+
+  state.submitted = true;
+  document.getElementById("submit-btn").disabled = true;
+  document.getElementById("answer-input").disabled = true;
+  document.getElementById("loading-text").classList.add("visible");
+  document.getElementById("error-msg").classList.remove("visible");
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: QUESTIONS[state.current],
+        response: answer,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    state.results.push({
+      prompt: QUESTIONS[state.current],
+      score: data.score,
+      verdict: data.verdict,
+      reason: data.reason,
+    });
+
+    showResult(data);
+  } catch (err) {
+    state.submitted = false;
+    document.getElementById("answer-input").disabled = false;
+    document.getElementById("submit-btn").disabled = false;
+    document.getElementById("loading-text").classList.remove("visible");
+    const errEl = document.getElementById("error-msg");
+    errEl.textContent = "Couldn't reach the scorer. Check your connection and try again.";
+    errEl.classList.add("visible");
+  }
+}
+
+function showResult(data) {
+  document.getElementById("loading-text").classList.remove("visible");
+
+  const isPass = data.verdict === "Passes";
+  const cls = isPass ? "pass" : "fail";
+
+  const scoreEl = document.getElementById("result-score");
+  scoreEl.textContent = data.score;
+  scoreEl.className = `score-number ${cls}`;
+
+  const verdictEl = document.getElementById("result-verdict");
+  verdictEl.textContent = data.verdict;
+  verdictEl.className = `verdict-badge ${cls}`;
+
+  document.getElementById("result-reason").textContent = data.reason;
+
+  const bar = document.getElementById("score-bar");
+  bar.className = `score-bar-fill ${cls}`;
+  bar.style.width = "0%";
+
+  document.getElementById("result-panel").classList.add("visible");
+
+  // Animate bar after paint
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.width = `${data.score}%`;
+    });
+  });
+
+  document.getElementById("submit-btn").style.display = "none";
+
+  const isLast = state.current === QUESTIONS.length - 1;
+  const nextBtn = document.getElementById("next-btn");
+  nextBtn.textContent = isLast ? "See results →" : "Next →";
+  nextBtn.style.display = "inline-block";
+
+  updateProgress(isPass ? "done" : "fail");
+}
+
+function nextQuestion() {
+  if (state.current < QUESTIONS.length - 1) {
+    loadQuestion(state.current + 1);
+  } else {
+    showFinal();
+  }
+}
+
+function showFinal() {
+  showScreen("final-screen");
+
+  const avg = Math.round(state.results.reduce((s, r) => s + r.score, 0) / state.results.length);
+  const passes = state.results.filter(r => r.verdict === "Passes").length;
+
+  document.getElementById("final-score-num").textContent = avg;
+  document.getElementById("final-score-num").style.color =
+    avg >= 60 ? "var(--pass)" : "var(--fail)";
+
+  document.getElementById("final-verdict-text").textContent = finalVerdict(avg, passes);
+
+  const breakdown = document.getElementById("results-breakdown");
+  breakdown.innerHTML = state.results.map((r, i) => {
+    const cls = r.verdict === "Passes" ? "pass" : "fail";
+    const shortQ = r.prompt.length > 60 ? r.prompt.slice(0, 57) + "…" : r.prompt;
+    return `
+      <div class="breakdown-row">
+        <div class="breakdown-q"><strong>Q${i+1}.</strong> ${shortQ}</div>
+        <div class="breakdown-score ${cls}">${r.score}</div>
+      </div>`;
+  }).join("");
+
+  // Reset progress dots to reflect results
+  state.results.forEach((r, i) => {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.className = "progress-dot " + (r.verdict === "Passes" ? "done" : "fail");
+  });
+}
+
+function finalVerdict(avg, passes) {
+  if (avg >= 80) return "You write like someone who's lived something. Hard to fake that.";
+  if (avg >= 60) return `${passes} of 5 passed. Mostly human. The gaps are interesting.`;
+  if (avg >= 40) return "The model kept catching you reaching for the safe answer.";
+  return "Either you're an AI, or you've spent too long writing like one.";
+}
+
+function updateProgress(resultClass) {
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    if (i < state.current) {
+      const r = state.results[i];
+      if (r) dot.className = "progress-dot " + (r.verdict === "Passes" ? "done" : "fail");
+    } else if (i === state.current) {
+      dot.className = "progress-dot " + (resultClass ? resultClass : "current");
+    } else {
+      dot.className = "progress-dot";
+    }
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function resetGame() {
+  state = { current: 0, results: [], submitted: false };
+  for (let i = 0; i < 5; i++) {
+    document.getElementById(`dot-${i}`).className = "progress-dot";
+  }
+  showScreen("intro-screen");
+}
+</script>
+</body>
+</html>
