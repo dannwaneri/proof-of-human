@@ -6,7 +6,7 @@
 
 Two weeks ago, I got flagged by Sloan.
 
-If you've been on DEV long enough, you know Sloan. I thought Sloan was a bot. [Sloan is Francis](https://dev.to/dannwaneri/i-got-flagged-by-sloan-sloan-is-a-guy-i-know-3d0e) — someone I've exchanged comments with for months. He reads every flagged article himself, runs it through GPTZero, makes a call. We'd been in each other's threads before he flagged mine.
+If you've been on DEV long enough, you know Sloan. I thought Sloan was a bot. [Sloan is Francis](https://dev.to/dannwaneri/i-got-flagged-by-sloan-sloan-is-a-guy-i-know-3d0e) — someone I've exchanged comments with for months, since before Richard left the platform. He posted about the flagging openly, tagged the founders, explained his reasoning. Then added: *"This was hard to tell you for many reasons."* He reads every flagged article himself, runs it through GPTZero, makes a call. He knew me. He flagged me anyway.
 
 [One of the flagged articles](https://dev.to/dannwaneri/has-sloan-flagged-your-article-lately-1gmh) had sparked a five-exchange comment thread that became an open-source repo. The thinking was mine. The flag still landed.
 
