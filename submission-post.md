@@ -16,7 +16,7 @@ That's the uncomfortable thing about the Turing Test in 2026: it doesn't measure
 
 ## The Game
 
-**[Play Proof of Human →](https://proof-of-human.pages.dev)**
+**[Play Proof of Human →](https://proof-of-human-3ts.pages.dev)**
 
 Five questions. You write your answers. Claude scores them 0–100 on how human they sound, tells you what gave you away, and at the end gives you an average.
 
@@ -87,7 +87,7 @@ The irony: I had to write like an AI to build a detector for AI writing. I kept 
 
 ## Play It
 
-**[→ proof-of-human.pages.dev](https://proof-of-human.pages.dev)**
+**[→ proof-of-human-3ts.pages.dev](https://proof-of-human-3ts.pages.dev)**
 
 Source: [github.com/dannwaneri/proof-of-human](https://github.com/dannwaneri/proof-of-human)
 
