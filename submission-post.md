@@ -6,7 +6,7 @@
 
 Two weeks ago, I got flagged by Sloan.
 
-If you've been on DEV long enough, you know Sloan. I thought Sloan was a bot. Sloan is [a person named Francis](https://dev.to/dannwaneri/i-got-flagged-by-sloan-sloan-is-a-guy-i-know-3d0e) — a community moderator who reads articles fully, runs them through GPTZero, and assesses whether the thinking is genuinely yours.
+If you've been on DEV long enough, you know Sloan. I thought Sloan was a bot. [Sloan is Francis](https://dev.to/dannwaneri/i-got-flagged-by-sloan-sloan-is-a-guy-i-know-3d0e) — someone I've exchanged comments with for months. He reads every flagged article himself, runs it through GPTZero, makes a call. We'd been in each other's threads before he flagged mine.
 
 [One of the flagged articles](https://dev.to/dannwaneri/has-sloan-flagged-your-article-lately-1gmh) had sparked a five-exchange comment thread that became an open-source repo. The thinking was mine. The flag still landed.
 
@@ -43,29 +43,17 @@ The June solstice is the longest day — the day the sun is most itself. Unambig
 
 That's what this game is asking for. Not your best answer. Your most *you* answer. The one that's slightly off-topic, slightly embarrassing, slightly specific in a way that reveals something you didn't mean to reveal. That's the signal.
 
-Turing's original question was: *can a machine think?* The question we're living with now is its inversion — *can a human still sound like one?* On the longest day, that feels worth asking.
+Turing's original question was: *can a machine think?* The question we're living with now is its inversion — *can a human still sound like one?*
 
 ---
 
 ## Technical Approach
 
-**Stack:** Vanilla JavaScript, zero dependencies, one HTML file. Cloudflare Worker as API proxy. Cloudflare Pages for hosting.
+Vanilla JS, no dependencies, one HTML file. Cloudflare Worker as proxy, Pages for hosting.
 
-The Worker keeps the Anthropic API key server-side — the frontend never touches it. One API call per round, model is `claude-sonnet-4-6`.
+The Worker sits between the browser and Anthropic. It receives your prompt and response, calls the API, returns `{ score, verdict, reason }`. The frontend never sees the API key. One call per question, nothing stored, model is `claude-sonnet-4-6`.
 
-**Worker** (`/score` endpoint):
-- Receives `{ prompt, response }` from the frontend
-- Calls the Anthropic Messages API with the scoring prompt
-- Returns `{ score, verdict, reason }` JSON
-- Full CORS headers for Pages → Worker communication
-
-**Frontend:**
-- Single `index.html`, no build step
-- Progress bar tracks your 5 answers (green = Passes, red = Flagged)
-- Score bar animates on result
-- Final screen shows average + breakdown
-
-The codebase is readable top-to-bottom. No framework magic, no hidden state. A judge can open DevTools and follow exactly what happens on each submit.
+The frontend is a single `index.html` — progress bar, animated score fill, final breakdown screen. No build step. A judge can open DevTools and follow exactly what happens on each submit.
 
 ```
 proof-of-human/
