@@ -18,6 +18,8 @@ That's the uncomfortable thing about the Turing Test in 2026: it doesn't measure
 
 **[Play Proof of Human →](https://proof-of-human-3ts.pages.dev)**
 
+{% youtube pSCJ30JcDDo %}
+
 Five questions. You write your answers. Claude scores them 0–100 on how human they sound, tells you what gave you away, and at the end gives you an average.
 
 The questions are the ones that actually separate humans from pattern-matchers:
