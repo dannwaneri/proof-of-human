@@ -39,7 +39,7 @@ The scoring prompt at the heart of it:
 
 Score 60+: **Passes**. Below 60: **Flagged**.
 
-**The solstice angle:** the June solstice is the longest day — the day the sun is most itself. Unambiguous. No hedging. That's what this game is asking for. Not your best answer. Your most *you* answer. Turing's original question was: *can a machine think?* The question we're living with now is its inversion — *can a human still sound like one?*
+The June solstice is the longest day — the day the sun is most itself. Unambiguous. No hedging. That's what this game is asking for. Not your best answer. Your most *you* answer. Turing's original question was: *can a machine think?* The question we're living with now is its inversion — *can a human still sound like one?*
 
 ---
 
@@ -73,7 +73,7 @@ The irony: I had to write like an AI to build a detector for AI writing. I kept 
 
 **Best Ode to Alan Turing**
 
-Turing's question was whether a machine could fool a human. This game inverts it — can a human fool the machine? The mechanic *is* the Turing Test, running live, powered by Claude. Not a tribute. Not a cipher. The actual question Turing asked, turned around and aimed at the player.
+Turing's question was whether a machine could fool a human. This game inverts it — can a human fool the machine? The mechanic is the Turing Test itself, running live, aimed back at the player.
 
 The submission post has a real backstory: I got flagged as AI-generated on this platform the same week I built this. The incident is documented in two public articles with 60+ comments between them. Writing that passed human editorial review at freeCodeCamp got flagged by a detector on DEV. That's not a contradiction to resolve. That's just where we are — and it's the question this game puts directly to you.
 
